@@ -5,7 +5,7 @@
 		type ContactErrors,
 		type ContactField,
 		type ContactForm,
-	} from '#shared/utils/contact';
+	} from '~/utils/contact';
 
 	type Status = 'idle' | 'loading' | 'success' | 'error';
 

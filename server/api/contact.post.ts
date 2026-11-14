@@ -8,7 +8,7 @@ import {
 	hasContactErrors,
 	validateContact,
 	type ContactForm,
-} from '#shared/utils/contact';
+} from '~/utils/contact';
 
 export default defineEventHandler(async (event) => {
 	const body = (await readBody<Partial<ContactForm>>(event)) ?? {};

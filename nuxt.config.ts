@@ -40,21 +40,9 @@ export default defineNuxtConfig({
 					href: 'https://fonts.gstatic.com',
 					crossorigin: '',
 				},
-				// Performance: the font CSS loads without blocking the first render
-				// (media="print" is applied right away and swapped to "all" on load).
-				// Until it arrives, text uses "Inter Fallback" (main.css), which
-				// matches Inter's metrics, so there is no layout shift.
 				{
 					rel: 'stylesheet',
-					href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
-					media: 'print',
-					onload: "this.media='all'",
-				},
-			],
-			noscript: [
-				{
-					innerHTML:
-						'<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">',
+					href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=block',
 				},
 			],
 		},
