@@ -53,6 +53,7 @@
 			message.value = res.message;
 			status.value = 'success';
 			emit('success', { ...form });
+			console.log('Lead sent to CRM and GA4.');
 		} catch (err: unknown) {
 			const data = (
 				err as {
@@ -70,6 +71,7 @@
 			message.value =
 				'No pudimos enviar tu solicitud. Inténtalo de nuevo en unos minutos.';
 			status.value = 'error';
+			console.log('Error sending lead to CRM and GA4.');
 		}
 	};
 
