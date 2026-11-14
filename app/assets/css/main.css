@@ -1,0 +1,29 @@
+@import "tailwindcss";
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  size-adjust: 107.12%;
+  ascent-override: 90.44%;
+  descent-override: 22.52%;
+  line-gap-override: 0%;
+}
+
+@theme {
+  --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+
+  --color-primary: #131f44;
+  --color-hover: #1e306c;
+  --color-accent: #7cdfc5;
+  --color-section: #f5f7fe;
+  --color-border: #e4e8f6;
+  --color-secondary: #4f5a95;
+  --color-danger: #c4314b;
+
+  --leading-figma: 1.45;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
