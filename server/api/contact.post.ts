@@ -37,9 +37,13 @@ export default defineEventHandler(async (event) => {
 		});
 	}
 
+	// The same id goes to the CRM (here) and to GA4 (generate_lead in the form)
+	const id = `req_${Date.now().toString(36)}`;
+	console.log('[CRM] lead', { lead_id: id, ...form });
+
 	return {
 		ok: true,
-		id: `req_${Date.now().toString(36)}`,
+		id,
 		message: `Gracias, ${name.split(' ')[0]}. Te contactaremos pronto.`,
 	};
 });

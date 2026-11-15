@@ -22,8 +22,22 @@
 	const status = ref<Status>('idle');
 	const message = ref('');
 
+	// Form tracking: only console.log, nothing is sent to GA4.
+	const track = (event: string, params: Record<string, unknown> = {}) => {
+		console.log(`[GA4] ${event}`, params);
+	};
+
+	let started = false;
+
+	const trackFieldErrors = (found: ContactErrors) => {
+		for (const [field, error] of Object.entries(found)) {
+			if (error) track('form_field_error', { field_name: field, error });
+		}
+	};
+
 	const validate = () => {
 		Object.assign(errors, validateContact(form));
+		trackFieldErrors(errors);
 		return !hasContactErrors(errors);
 	};
 
@@ -34,44 +48,54 @@
 			for (const key of Object.keys(now) as ContactField[]) {
 				if (now[key] !== before[key]) errors[key] = undefined;
 			}
+			// form_start: first edit only
+			if (!started && Object.values(now).some(Boolean)) {
+				started = true;
+				track('form_start');
+			}
 		},
 	);
 
 	const onSubmit = async () => {
-		if (status.value === 'loading' || !validate()) return;
+		if (status.value === 'loading') return;
+		track('form_submit_attempt', { ...form });
+		if (!validate()) return;
 
 		status.value = 'loading';
 		message.value = '';
 		try {
-			const res = await $fetch<{ ok: boolean; message: string }>(
-				'/api/contact',
-				{
-					method: 'POST',
-					body: { ...form },
-				},
-			);
+			const res = await $fetch<{
+				ok: boolean;
+				id: string;
+				message: string;
+			}>('/api/contact', {
+				method: 'POST',
+				body: { ...form },
+			});
+			
+			// Only on 2xx. Same id the server logged as the CRM lead.
+			track('generate_lead', { lead_id: res.id });
 			message.value = res.message;
 			status.value = 'success';
 			emit('success', { ...form });
-			console.log('Lead sent to CRM and GA4.');
 		} catch (err: unknown) {
-			const data = (
-				err as {
-					data?: {
-						data?: { fieldErrors?: ContactErrors };
-					};
-				}
-			).data;
+			const { statusCode, data } = err as {
+				statusCode?: number;
+				data?: {
+					data?: { fieldErrors?: ContactErrors };
+				};
+			};
+			track('form_submit_error', { error_code: statusCode ?? 'network' });
 			if (data?.data?.fieldErrors) {
 				// 422: show the server's per-field errors only
 				Object.assign(errors, data.data.fieldErrors);
+				trackFieldErrors(data.data.fieldErrors);
 				status.value = 'idle';
 				return;
 			}
 			message.value =
 				'No pudimos enviar tu solicitud. Inténtalo de nuevo en unos minutos.';
 			status.value = 'error';
-			console.log('Error sending lead to CRM and GA4.');
 		}
 	};
 
@@ -84,6 +108,7 @@
 		});
 		status.value = 'idle';
 		message.value = '';
+		started = false;
 	};
 </script>
 
